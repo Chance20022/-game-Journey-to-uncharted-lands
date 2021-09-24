@@ -8,6 +8,7 @@ bool init();
 const int WALKING_ANIMATION_FRAMES = 20;
 SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
 LTexture gSpriteSheetTexture;
+LTexture gBackground;
 
 int main(int argc, char* args[])
 {
@@ -49,11 +50,11 @@ int main(int argc, char* args[])
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_a:
-                    degrees -= 16;
+                    degrees -= 15;
                     break;
 
                 case SDLK_d:
-                    degrees += 16;
+                    degrees += 15;
                     break;
 
                 case SDLK_q:
@@ -71,8 +72,8 @@ int main(int argc, char* args[])
             }
         }
 
-        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
+
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[frame];
         gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, degrees, NULL, flipType);
@@ -117,6 +118,11 @@ bool loadMedia()
 
             x += 109;
         }
+    }
+
+    if (gBackground.loadFromFile("Image/background.png")) {
+        printf("Failed to load walking animation texture!\n");
+        success = false;
     }
 
     return success;
