@@ -19,6 +19,13 @@ int main(int argc, char* args[])
 
     //Current animation frame
     int frame = 0;
+    int frameSlower = 0;
+
+    //Angle of rotation
+    double degrees = 0;
+
+    //Flip type
+    SDL_RendererFlip flipType = SDL_FLIP_NONE;
 
     if (!init()) {
         printf("Error init() \n");
@@ -37,23 +44,53 @@ int main(int argc, char* args[])
             {
                 quit = true;
             }
+            else if (e.type == SDL_KEYDOWN)
+            {
+                switch (e.key.keysym.sym)
+                {
+                case SDLK_a:
+                    degrees -= 16;
+                    break;
+
+                case SDLK_d:
+                    degrees += 16;
+                    break;
+
+                case SDLK_q:
+                    flipType = SDL_FLIP_HORIZONTAL;
+                    break;
+
+                case SDLK_w:
+                    flipType = SDL_FLIP_NONE;
+                    break;
+
+                case SDLK_e:
+                    flipType = SDL_FLIP_VERTICAL;
+                    break;
+                }
+            }
         }
 
+        SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
         SDL_RenderClear(gRenderer);
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[frame];
-        gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip);
+        gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, degrees, NULL, flipType);
 
         //Update screen
         SDL_RenderPresent(gRenderer);
 
         //Go to next frame
-        frame++;
+        frameSlower += 1;
+        if (frameSlower % 2 == 0) {
+            frame++;
+        }
 
         //Cycle animation
         if (frame >= WALKING_ANIMATION_FRAMES)
         {
             frame = 0;
+            frameSlower = 0;
         }
     }
     close();
