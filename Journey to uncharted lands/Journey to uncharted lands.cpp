@@ -1,5 +1,6 @@
 ﻿#include "Essence.h"
 
+SDL_Texture* loadTexture(std::string path);
 bool loadMedia();
 void close();
 bool init();
@@ -8,7 +9,8 @@ bool init();
 const int WALKING_ANIMATION_FRAMES = 20;
 SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
 LTexture gSpriteSheetTexture;
-LTexture gBackground;
+
+SDL_Texture* Background;
 
 int main(int argc, char* args[])
 {
@@ -74,6 +76,8 @@ int main(int argc, char* args[])
 
         SDL_RenderClear(gRenderer);
 
+        SDL_RenderCopy(gRenderer, Background, NULL, NULL);
+
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[frame];
         gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, degrees, NULL, flipType);
@@ -120,10 +124,7 @@ bool loadMedia()
         }
     }
 
-    if (gBackground.loadFromFile("Image/background.png")) {
-        printf("Failed to load walking animation texture!\n");
-        success = false;
-    }
+    Background = loadTexture("Image/background.png");
 
     return success;
 }
@@ -189,4 +190,31 @@ bool init()
     }
 
     return success;
+}
+
+SDL_Texture* loadTexture(std::string path)
+{
+    //The final texture
+    SDL_Texture* newTexture = NULL;
+
+    //Load image at specified path
+    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+    if (loadedSurface == NULL)
+    {
+        printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
+    }
+    else
+    {
+        //Create texture from surface pixels
+        newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
+        if (newTexture == NULL)
+        {
+            printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+        }
+
+        //Get rid of old loaded surface
+        SDL_FreeSurface(loadedSurface);
+    }
+
+    return newTexture;
 }
