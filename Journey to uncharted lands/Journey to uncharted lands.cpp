@@ -10,7 +10,7 @@ const int WALKING_ANIMATION_FRAMES = 20;
 SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
 LTexture gSpriteSheetTexture;
 
-SDL_Texture* Background;
+LTexture Background;
 
 int main(int argc, char* args[])
 {
@@ -76,7 +76,7 @@ int main(int argc, char* args[])
 
         SDL_RenderClear(gRenderer);
 
-        SDL_RenderCopy(gRenderer, Background, NULL, NULL);
+        Background.render(0,0);
 
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[frame];
@@ -124,7 +124,11 @@ bool loadMedia()
         }
     }
 
-    Background = loadTexture("Image/background.png");
+    if (Background.loadFromFile("Image/background.png")) {
+        printf("Failed to load walking animation texture!\n");
+        success = false;
+    }
+    
 
     return success;
 }
@@ -132,6 +136,7 @@ bool loadMedia()
 void close()
 {
     gSpriteSheetTexture.free();
+    Background.free();
 
     //Destroy window    
     SDL_DestroyRenderer(gRenderer);
