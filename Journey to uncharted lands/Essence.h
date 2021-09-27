@@ -2,6 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_ttf.h>
 
 //Screen dimension constants
 const int SCREEN_WIDTH = 1280;
@@ -11,6 +12,9 @@ const int SCREEN_HEIGHT = 720;
 inline SDL_Window* gWindow = NULL;
 //The window renderer
 inline SDL_Renderer* gRenderer = NULL;
+
+//Globally used font
+inline TTF_Font* gFont = NULL;
 
 //Texture wrapper class
 class LTexture
@@ -24,6 +28,9 @@ public:
 
     //Loads image at specified path
     bool loadFromFile(std::string path);
+
+    //Creates image from font string
+    bool loadFromRenderedText(std::string textureText, SDL_Color textColor);
 
     //Deallocates texture
     void free();

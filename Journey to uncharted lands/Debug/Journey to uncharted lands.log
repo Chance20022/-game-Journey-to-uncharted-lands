@@ -1,4 +1,5 @@
 ﻿  Journey to uncharted lands.cpp
+E:\Project of programming\-game-Journey-to-uncharted-lands\Journey to uncharted lands\Journey to uncharted lands.cpp(76,74): warning C4244: аргумент: преобразование "double" в "int", возможна потеря данных
   Texture.cpp
   Создание кода...
   Journey to uncharted lands.vcxproj -> E:\Project of programming\-game-Journey-to-uncharted-lands\Debug\Journey to uncharted lands.exe

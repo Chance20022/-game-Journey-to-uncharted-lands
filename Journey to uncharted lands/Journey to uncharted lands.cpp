@@ -9,8 +9,8 @@ bool init();
 const int WALKING_ANIMATION_FRAMES = 20;
 SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
 LTexture gSpriteSheetTexture;
-
 LTexture Background;
+LTexture gText;
 
 int main(int argc, char* args[])
 {
@@ -26,6 +26,8 @@ int main(int argc, char* args[])
 
     //Angle of rotation
     double degrees = 0;
+
+    double move = 0;
 
     //Flip type
     SDL_RendererFlip flipType = SDL_FLIP_NONE;
@@ -52,24 +54,15 @@ int main(int argc, char* args[])
                 switch (e.key.keysym.sym)
                 {
                 case SDLK_a:
-                    degrees -= 15;
-                    break;
-
-                case SDLK_d:
-                    degrees += 15;
-                    break;
-
-                case SDLK_q:
                     flipType = SDL_FLIP_HORIZONTAL;
+                    move -= 10;
                     break;
-
-                case SDLK_w:
+                case SDLK_d:
                     flipType = SDL_FLIP_NONE;
+                    move += 10;
                     break;
-
-                case SDLK_e:
-                    flipType = SDL_FLIP_VERTICAL;
-                    break;
+                default:
+                    move = 0;
                 }
             }
         }
@@ -80,7 +73,9 @@ int main(int argc, char* args[])
 
         //Render current frame
         SDL_Rect* currentClip = &gSpriteClips[frame];
-        gSpriteSheetTexture.render((SCREEN_WIDTH - currentClip->w) / 2, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, degrees, NULL, flipType);
+        gSpriteSheetTexture.render(((SCREEN_WIDTH - currentClip->w) / 2) + move, (SCREEN_HEIGHT - currentClip->h) / 2, currentClip, degrees, NULL, flipType);
+
+        gText.render(0, 0);
 
         //Update screen
         SDL_RenderPresent(gRenderer);
@@ -128,8 +123,21 @@ bool loadMedia()
         printf("Failed to load walking animation texture!\n");
         success = false;
     }
-    
 
+    gFont = TTF_OpenFont("Fonts/VenrynSans-Black.ttf", 28);
+    if (gFont == NULL) {
+        printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
+        success = false;
+    }
+    else {
+        SDL_Color textColor = { 0,0,0 };
+
+        if (gText.loadFromRenderedText("Hello, my game!", textColor)) {
+            printf("Failed to render text texture!\n");
+            success = false;
+        }
+
+    }
     return success;
 }
 
@@ -137,6 +145,10 @@ void close()
 {
     gSpriteSheetTexture.free();
     Background.free();
+    gText.free();
+
+    TTF_CloseFont(gFont);
+    gFont = NULL;
 
     //Destroy window    
     SDL_DestroyRenderer(gRenderer);
@@ -145,6 +157,7 @@ void close()
     gRenderer = NULL;
 
     //Quit SDL subsystems
+    TTF_Quit();
     IMG_Quit();
     SDL_Quit();
 }
@@ -188,6 +201,13 @@ bool init()
                 if (!(IMG_Init(imgFlags) & imgFlags))
                 {
                     printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError());
+                    success = false;
+                }
+
+                //Initialize SDL_ttf
+                if (TTF_Init() == -1)
+                {
+                    printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
                     success = false;
                 }
             }
